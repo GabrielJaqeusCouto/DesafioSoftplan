@@ -1,0 +1,80 @@
+unit Main;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls;
+
+type
+  TfMain = class(TForm)
+    btDatasetLoop: TButton;
+    btThreads: TButton;
+    btStreams: TButton;
+    procedure btDatasetLoopClick(Sender: TObject);
+    procedure btStreamsClick(Sender: TObject);
+    procedure FormCreate(Sender: TObject);
+  private
+    FLogFile: String;
+  public
+    constructor Create;
+    procedure TrataException(Sender: TObject; E: Exception);
+    procedure GravarLog(Value: String);
+  end;
+
+var
+  fMain: TfMain;
+  MinhaException : TfMain;
+
+implementation
+
+uses
+  DatasetLoop, ClienteServidor;
+
+{$R *.dfm}
+
+procedure TfMain.btDatasetLoopClick(Sender: TObject);
+begin
+  fDatasetLoop.Show;
+end;
+
+procedure TfMain.btStreamsClick(Sender: TObject);
+begin
+  fClienteServidor.Show;
+end;
+
+constructor TfMain.Create;
+begin
+      //teste
+end;
+
+procedure TfMain.FormCreate(Sender: TObject);
+begin
+  FLogFile := ChangeFileExt(ParamStr(0), '.log');
+  Application.OnException := TrataException;
+end;
+
+procedure TfMain.GravarLog(Value: String);
+var
+  txtLog: TextFile;
+begin
+  AssignFile(txtLog, FLogFile);
+  if FileExists(FLogFile) then
+    Append(txtLog)
+  else
+    Rewrite(txtLog);
+
+  Writeln(txtLog, FormatDateTime('dd/mm/yy hh:nn:ss', Now) + Value);
+  CloseFile(txtLog);
+end;
+
+procedure TfMain.TrataException(Sender: TObject; E: Exception);
+begin
+  GravarLog('================================================');
+  GravarLog('Class: ' + E.ClassName);
+  GravarLog('Erro Message: ' + E.Message);
+  GravarLog('================================================');
+  ShowMessage(E.Message);
+end;
+
+end.
